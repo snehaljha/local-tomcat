@@ -6,6 +6,29 @@
   "engines": {
     "vscode": "^1.66.0"
   },
+  "publisher": "SnehalJha",
+  "author": {
+    "name": "Snehal Jha"
+  },
+  "license": "GPLv3",
+  "homepage": "https://github.com/snehaljha/local-tomcat",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snehaljha/local-tomcat"
+  },
+  "bugs": {
+    "url": "https://github.com/snehaljha/local-tomcat/issues"
+  },
+  "keywords": [
+    "tomcat",
+    "java",
+    "deploy",
+    "deployment",
+    "webapp",
+    "war",
+    "local"
+  ],
+  "icon": "img/local-tomcat.png",
   "categories": [
     "Other"
   ],
