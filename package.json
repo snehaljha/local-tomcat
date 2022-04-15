@@ -66,39 +66,39 @@
     "commands": [
       {
         "command": "local-tomcat.verifyTomcat",
-        "title": "Verify Tomcat"
+        "title": "LT: Verify Tomcat"
       },
       {
         "command": "local-tomcat.removeAllWARs",
-        "title": "Remove All wars"
+        "title": "LT: Remove All wars"
       },
       {
         "command": "local-tomcat.removeWAR",
-        "title": "Remove War"
+        "title": "LT: Remove War"
       },
       {
         "command": "local-tomcat.openLogFile",
-        "title": "Open Log File"
+        "title": "LT: Open Log File"
       },
       {
         "command": "local-tomcat.clearWorkDir",
-        "title": "Clear Work Directory"
+        "title": "LT: Clear Work Directory"
       },
       {
         "command": "local-tomcat.runTomcat",
-        "title": "Run Tomcat"
+        "title": "LT: Run Tomcat"
       },
       {
         "command": "local-tomcat.stopTomcat",
-        "title": "Stop Tomcat"
+        "title": "LT: Stop Tomcat"
       },
       {
         "command": "local-tomcat.runTomcatDebug",
-        "title": "Run Tomcat in Debug Mode"
+        "title": "LT: Run Tomcat in Debug Mode"
       },
       {
         "command": "local-tomcat.deployWar",
-        "title": "Deploy WAR"
+        "title": "LT: Deploy WAR"
       }
     ]
   },
