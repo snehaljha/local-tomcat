@@ -1,70 +1,44 @@
-# local-tomcat README
-
-This is the README for your extension "local-tomcat". After writing up a brief description, we recommend including the following sections.
+# Local Tomcat (LT)
+An extension to reduce open explorer windows or tabs and repetitive hassle to deploy and manage applications deployed on local tomcat.
 
 ## Features
+After configuring required properties. It can deploy, remove and can even open logs within few key presses. Currently 9 commands are supported to make work easier.
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+\!\[Available Commands\]\(https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/commands.png\)
 
-For example if there is an image subfolder under your extension project workspace:
+* LT: Verify Tomcat - Will verify the location of tomcat home / catalina home.
+* LT: Remove All wars - Will remove all the deployed war from tomcat instance.
+* LT: Remove War - Will ask prompt to select the war to be removed.
+* LT: Open Log File - Will prompt to open different kinds of latest log file.
+* LT: Clear Work Directory - Will clear work directory to remove any cache causing any sort of problem.
+* LT: Run Tomcat - Will run the tomcat instance in its configured port if its not already running.
+* LT: Stop Tomcat - Will stop the tomcat instance if it is running.
+* LT: Run Tomcat in Debug Mode - Will run the tomcat in debug mode in its configured port if its not already running.
+* LT: Deploy WAR - Will deploy the war prompting for context name.
 
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+* Local installed and working instance of tomcat.
+* VSCode version >= 1.66.0
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+The only required configuration are these two keys that can be added in settings.json
+\!\[Settings\]\(https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/settings.png\)
 
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+* local-tomcat.catalinaHome (required) to be configured to tomcat home / catalina home.
+* local-tomcat.warDir (optional) will contain relative path to war directory. Default value is 'target'.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+* Currently only supported for windows.
+* Only Single war will be deployed even if target contains multiple.
 
 ## Release Notes
 
 Users appreciate release notes as you update your extension.
 
-### 1.0.0
+### 0.0.1
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Initial release
