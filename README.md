@@ -4,7 +4,7 @@ An extension to reduce open explorer windows or tabs and repetitive hassle to de
 ## Features
 After configuring required properties. It can deploy, remove and can even open logs within few key presses. Currently 9 commands are supported to make work easier.
 
-\!\[Available Commands\]\(https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/commands.png\)
+![Available Commands](https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/commands.png)
 
 * LT: Verify Tomcat - Will verify the location of tomcat home / catalina home.
 * LT: Remove All wars - Will remove all the deployed war from tomcat instance.
@@ -25,7 +25,8 @@ After configuring required properties. It can deploy, remove and can even open l
 ## Extension Settings
 
 The only required configuration are these two keys that can be added in settings.json
-\!\[Settings\]\(https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/settings.png\)
+
+![Settings](https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/settings.png)
 
 * local-tomcat.catalinaHome (required) to be configured to tomcat home / catalina home.
 * local-tomcat.warDir (optional) will contain relative path to war directory. Default value is 'target'.
