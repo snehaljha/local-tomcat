@@ -13,6 +13,12 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "local-tomcat" is now active!');
 
+	const os = require('os');
+
+	const catalinaScript = os.type() === 'Windows_NT' ? 'catalina.bat' : 'catalina.sh';
+	const filePathPrefix = os.type() === 'Windows_NT' ? 'file:///' : '';
+
+	const path = require('path');
 	function tomcatRun(debugMode = false) {
 		if(tomcat.running) {
 			vscode.window.showInformationMessage('Tomcat is already running');
@@ -22,9 +28,9 @@ export function activate(context: vscode.ExtensionContext) {
 		const { spawn } = require("child_process");
 		let cmd;
 		if(debugMode) {
-			cmd = spawn(tomcat.catalinaHome+'\\bin\\catalina.bat', ['jpda', 'run']);
+			cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ['jpda', 'run']);
 		} else {
-			cmd = spawn(tomcat.catalinaHome+'\\bin\\catalina.bat', ['run']);
+			cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ['run']);
 		}
 		tomcat.running = true;
 		outputChannel.appendLine('Starting tomcat');
@@ -103,7 +109,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const selectedLogFile = await vscode.window.showQuickPick(options);
 		const filePath = tomcatLogs.getLogFilePath(selectedLogFile+'.');
 
-		var openPath = vscode.Uri.parse("file:///" + filePath); //A request file path
+		var openPath = vscode.Uri.parse(filePathPrefix + filePath); //A request file path
 		vscode.workspace.openTextDocument(openPath).then(doc => {
 			vscode.window.showTextDocument(doc);
 		});
@@ -124,7 +130,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let stopTomcat = vscode.commands.registerCommand('local-tomcat.stopTomcat', () => {
 		const { spawn } = require("child_process");
-		spawn(tomcat.catalinaHome+'\\bin\\catalina.bat', ["stop"]);
+		spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ["stop"]);
 		tomcat.running = false;
 	});
 
@@ -177,4 +183,6 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	vscode.commands.executeCommand('local-tomcat.stopTomcat');
+}

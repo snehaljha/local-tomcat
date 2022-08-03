@@ -3,18 +3,19 @@ import { assert } from "console";
 export class Deployer {
     warDir: string;
     webappDir: string;
+    private path = require('path');
     
     constructor(cwd: string, homeDir: string, warLoc: string) {
         if(cwd === '' || warLoc.trim() === '' || warLoc === undefined) {
             this.warDir = '';
         } else {
-            this.warDir = cwd + '\\' + warLoc;
+            this.warDir = this.path.resolve(cwd, warLoc);
         }
 
         if(homeDir.trim() === '' || homeDir === undefined) {
             this.webappDir = '';
         } else {
-            this.webappDir = homeDir + '\\webapps'; 
+            this.webappDir = this.path.resolve(homeDir, 'webapps'); 
         }
     }
     
@@ -67,7 +68,7 @@ export class Deployer {
             assert(contextName && contextName.trim() !== '.war');
 
             const fs = require('fs');
-            fs.copyFileSync(this.warDir+'\\'+name+'.war', this.webappDir+'\\'+contextName);
+            fs.copyFileSync(this.path.resolve(this.warDir, name+'.war'), this.path.resolve(this.webappDir, contextName));
             return true;
         } catch (ex) {
             console.log(ex);

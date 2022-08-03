@@ -3,6 +3,7 @@ export class Tomcat {
     private bin: string;
     running: boolean;
     webapps: string;
+    private path = require('path');
     
     constructor(homeDir: string|undefined) {
         if(homeDir) {
@@ -36,7 +37,7 @@ export class Tomcat {
                 }
             }
             
-            files = fs.readdirSync(this.catalinaHome + '\\' + this.bin);
+            files = fs.readdirSync(this.path.resolve(this.catalinaHome, this.bin));
             checkFiles = ['catalina.bat', 'catalina.sh', 'shutdown.bat', 'shutdown.sh'];
             set = new Set<string>();
             for(const f of files) {
@@ -58,7 +59,7 @@ export class Tomcat {
     removeAllWars(): boolean {
         try {
             const fs = require('fs');
-            const files = fs.readdirSync(this.catalinaHome+'\\'+this.webapps);
+            const files = fs.readdirSync(this.path.resolve(this.catalinaHome, this.webapps));
             const warFiles = [];
             for(const f of files) {
                 if(f.endsWith('.war')) {
@@ -79,7 +80,7 @@ export class Tomcat {
     
     getDeployedWars(): Array<string> {
         const fs = require('fs');
-        const files = fs.readdirSync(this.catalinaHome+'\\'+this.webapps);
+        const files = fs.readdirSync(this.path.resolve(this.catalinaHome, this.webapps));
         const wars = [];
         for(const f of files) {
             if(f.endsWith('.war')) {
@@ -97,7 +98,7 @@ export class Tomcat {
 
         try {
             const fs = require('fs');
-            const files = fs.readdirSync(this.catalinaHome+'\\'+this.webapps);
+            const files = fs.readdirSync(this.path.resolve(this.catalinaHome, this.webapps));
             const deployedDirs = [];
             const fileSet = new Set<string>();
             for(const f of files) {
@@ -109,14 +110,14 @@ export class Tomcat {
                     deployedDirs.push(f.replace('.war', ''));
                 }
                 console.log('deleing ' + f);
-                fs.unlinkSync(this.catalinaHome + '\\' + this.webapps + '\\' + f);
+                fs.unlinkSync(this.path.resolve(this.catalinaHome, this.webapps, f));
                 console.log('deleted ' + f);
             }
             
             if(!this.running) {
                 for(const f of deployedDirs) {
                     console.log('deleing ' + f);
-                    fs.rmSync(this.catalinaHome + '\\' + this.webapps + '\\' + f, {recursive:true, force:true});
+                    fs.rmSync(this.path.resolve(this.catalinaHome, this.webapps, f), {recursive:true, force:true});
                     console.log('deleted ' + f);
                 }
             }
@@ -129,11 +130,11 @@ export class Tomcat {
 
     clearWork(): boolean {
         try{
-            const location = this.catalinaHome+'\\work\\Catalina\\localhost';
+            const location = this.path.resolve(this.catalinaHome, 'work', 'Catalina', 'localhost');
             const fs = require('fs');
             const files = fs.readdirSync(location);
             for(const f of files) {
-                fs.rmSync(location+'\\'+f, {recursive:true, force:true});
+                fs.rmSync(this.path.resolve(location, f), {recursive:true, force:true});
             }
             return true;
         } catch(ex) {

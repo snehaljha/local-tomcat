@@ -2,7 +2,7 @@
   "name": "local-tomcat",
   "displayName": "Local Tomcat",
   "description": "Provides extra functionality in vs code using local configurable tomcat installation.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.66.0"
   },
