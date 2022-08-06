@@ -32,8 +32,6 @@ The only required configuration are these two keys that can be added in settings
 * local-tomcat.warDir (optional) will contain relative path to war directory. Default value is 'target'.
 
 ## Known Issues
-
-* Currently only supported for windows.
 * Only Single war will be deployed even if target contains multiple.
 
 ## Release Notes
