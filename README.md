@@ -41,3 +41,7 @@ Users appreciate release notes as you update your extension.
 ### 0.0.1
 
 Initial release
+
+### 0.1.0
+
+Added support for all platforms (Windows, Linux, Darwin).
