@@ -17,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const catalinaScript = os.type() === 'Windows_NT' ? 'catalina.bat' : 'catalina.sh';
 	const filePathPrefix = os.type() === 'Windows_NT' ? 'file:///' : '';
+	const { spawn } = require("child_process");
 
 	const path = require('path');
 	function tomcatRun(debugMode = false) {
@@ -25,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		vscode.commands.executeCommand('local-tomcat.stopTomcat');
-		const { spawn } = require("child_process");
 		let cmd;
 		if(debugMode) {
 			cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ['jpda', 'run']);
@@ -55,6 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let env = vscode.workspace.getConfiguration('local-tomcat');
 	let tomcat = new Tomcat(env.catalinaHome);
+	let port = env.deploymentPort;
 	let tomcatLogs = new TomcatLogs(env.catalinaHome);
 	const outputChannel = vscode.window.createOutputChannel('Local Tomcat');
 	let cwd;
@@ -178,8 +179,27 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	let launchWebapp = vscode.commands.registerCommand('local-tomcat.launchWebapp', async () => {
+		if(!tomcat.running) {
+			vscode.window.showInformationMessage('Tomcat is not running');
+			return;
+		}
+		let deployedApps = tomcat.getDeployedApps();
+		const choice = await vscode.window.showQuickPick(deployedApps);
+
+		vscode.env.openExternal(vscode.Uri.parse('http://localhost:' + port + '/' + choice));
+
+	});
+
+	let openDeployedDir = vscode.commands.registerCommand('local-tomcat.openDeployedDir', async () => {
+		let deployedApps = tomcat.getDeployedApps();
+		const choice = await vscode.window.showQuickPick(deployedApps);
+		spawn('code', ['-n', path.resolve(tomcat.catalinaHome, tomcat.webapps, choice)]);
+
+	});
+
 	context.subscriptions.push(disposable, removeAllWARs, removeWar, openLogFile, clearWorkDir, runTomcat, stopTomcat,
-		runTomcatDebug, deployWar);
+		runTomcatDebug, deployWar, launchWebapp, openDeployedDir);
 }
 
 // this method is called when your extension is deactivated

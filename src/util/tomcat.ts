@@ -143,4 +143,16 @@ export class Tomcat {
 
         return false;
     }
+
+    getDeployedApps(): Array<string> {
+        const fs = require('fs');
+        const files = fs.readdirSync(this.path.resolve(this.catalinaHome, this.webapps));
+        const apps = [];
+        for(const f of files) {
+            if(f.endsWith('.war') && files.includes(f.replace('.war', ''))) {
+                apps.push(f.replace('.war', ''));
+            }
+        }
+        return apps;
+    }
 }
