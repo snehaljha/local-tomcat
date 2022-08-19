@@ -15,6 +15,8 @@ After configuring required properties. It can deploy, remove and can even open l
 * LT: Stop Tomcat - Will stop the tomcat instance if it is running.
 * LT: Run Tomcat in Debug Mode - Will run the tomcat in debug mode in its configured port if its not already running.
 * LT: Deploy WAR - Will deploy the war prompting for context name.
+* LT: Launch Webapp - Will present an option to select deployed webapp which will be launched using browser.
+* LT: Open Webapp Directory - Will present an option to select deployed webapp which will open that deployed folder in separate vscode instance.
 
 
 ## Requirements
@@ -30,9 +32,7 @@ The only required configuration are these two keys that can be added in settings
 
 * local-tomcat.catalinaHome (required) to be configured to tomcat home / catalina home.
 * local-tomcat.warDir (optional) will contain relative path to war directory. Default value is 'target'.
-
-## Known Issues
-* Only Single war will be deployed even if target contains multiple.
+* local-tomcat.deploymentPort (optional) tomcat port at which applications are accessible. Default value is 8080.
 
 ## Release Notes
 
@@ -45,3 +45,9 @@ Initial release
 ### 0.1.0
 
 Added support for all platforms (Windows, Linux, Darwin).
+
+
+### 0.2.0
+* Added multi-war deployement.
+* Added option to open deployed webapp directory.
+* Added option to launch webapp in browser.
