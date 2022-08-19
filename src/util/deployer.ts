@@ -60,7 +60,7 @@ export class Deployer {
             assert(contextName && contextName.trim() !== '.war');
 
             const fs = require('fs');
-            fs.copyFileSync(this.path.resolve(this.warDir, warName+'.war'), this.path.resolve(this.webappDir, contextName));
+            fs.copyFileSync(this.path.resolve(this.warDir, warName), this.path.resolve(this.webappDir, contextName));
             return true;
         } catch (ex) {
             console.log(ex);
