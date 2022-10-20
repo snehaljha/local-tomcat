@@ -17,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const catalinaScript = os.type() === 'Windows_NT' ? 'catalina.bat' : 'catalina.sh';
 	const filePathPrefix = os.type() === 'Windows_NT' ? 'file:///' : '';
+	const { spawn } = require("child_process");
 
 	const path = require('path');
 	function tomcatRun(debugMode = false) {
@@ -25,7 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		vscode.commands.executeCommand('local-tomcat.stopTomcat');
-		const { spawn } = require("child_process");
 		let cmd;
 		if(debugMode) {
 			cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ['jpda', 'run']);
@@ -55,6 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let env = vscode.workspace.getConfiguration('local-tomcat');
 	let tomcat = new Tomcat(env.catalinaHome);
+	let port = env.deploymentPort;
 	let tomcatLogs = new TomcatLogs(env.catalinaHome);
 	const outputChannel = vscode.window.createOutputChannel('Local Tomcat');
 	let cwd;
@@ -144,28 +145,74 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage(validity);
 			return;
 		}
-		let targetappName = deployer.getTargetWarName();
-		if(!targetappName) {
+		let targetappNames = deployer.getTargetWarNames();
+		if(!targetappNames || targetappNames?.length === 0) {
 			vscode.window.showErrorMessage('No war Available');
 			return;
 		}
-		let contextName = await vscode.window.showInputBox({prompt: 'App Context Name', placeHolder: 'Leave empty for default name'});
-		const warPresent = deployer.checkDeployedWar(contextName);
-		if(warPresent) {
-			const options = ['Replace', 'Cancel'];
-			const choice = await vscode.window.showQuickPick(options);
-			if(choice !== options[0]) {
-				return;
+
+		let overallStatus = false;
+		if(targetappNames.length > 1) {
+			let selectedWars = await vscode.window.showQuickPick(targetappNames, {canPickMany: true});
+			if(!selectedWars) {
+				selectedWars = [];
 			}
-			tomcat.removeWars([contextName+'.war']);
+			let contextSet: Array<string> = [];
+			let error = false;
+			for(let i: number = 0; i< selectedWars.length; i++) {
+				let contextName = await vscode.window.showInputBox({prompt: (error ? 'Name already chosen for ' : 'App Context Name for ') + selectedWars[i], placeHolder: 'Leave empty for default name'});
+				error = false;
+				if(!contextName || contextName === '') {
+					contextName = selectedWars[i];
+				}
+				if(contextSet.includes(contextName)) {
+					error = true;
+					i--;
+				}
+				contextSet.push(contextName);
+				const warPresent = deployer.checkDeployedWar(contextName);
+				if(warPresent) {
+					const options = ['Replace ' + selectedWars[i], 'Cancel'];
+					const choice = await vscode.window.showQuickPick(options);
+					if(choice !== options[0]) {
+						continue;
+					}
+					tomcat.removeWars([contextName+'.war']);
+				}
+				const status = deployer.deployWar(selectedWars[i]+'.war', contextName);
+				if(!status) {
+					vscode.window.showErrorMessage(`Deployement of ${contextName} failed`);
+				} else {
+					overallStatus = true;
+				}
+			}
+
+
+
+		} else {
+			let contextName = await vscode.window.showInputBox({prompt: 'App Context Name', placeHolder: 'Leave empty for default name'});
+			const warPresent = deployer.checkDeployedWar(!contextName || contextName === '' ? targetappNames[0] : contextName);
+			if(warPresent) {
+				const options = ['Replace', 'Cancel'];
+				const choice = await vscode.window.showQuickPick(options);
+				if(choice !== options[0]) {
+					return;
+				}
+				tomcat.removeWars([contextName+'.war']);
+			}
+			const status = deployer.deployWar(targetappNames[0]+'.war', contextName);
+			if(!status) {
+				vscode.window.showErrorMessage('Deployement of war failed');
+			}
+			overallStatus = status;
 		}
-		const status = deployer.deployWar(contextName);
-		if(!status) {
-			vscode.window.showErrorMessage('Deployement of war failed');
+
+		if(!overallStatus) {
 			return;
 		}
 
-		vscode.window.showInformationMessage('Moved war package');
+
+		vscode.window.showInformationMessage('Moved war package(s)');
 
 		if(!tomcat.running) {
 			const options = ['Run tomcat', 'Run tomcat in debug mode'];
@@ -178,8 +225,27 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	let launchWebapp = vscode.commands.registerCommand('local-tomcat.launchWebapp', async () => {
+		if(!tomcat.running) {
+			vscode.window.showInformationMessage('Tomcat is not running');
+			return;
+		}
+		let deployedApps = tomcat.getDeployedApps();
+		const choice = await vscode.window.showQuickPick(deployedApps);
+
+		vscode.env.openExternal(vscode.Uri.parse('http://localhost:' + port + '/' + choice));
+
+	});
+
+	let openDeployedDir = vscode.commands.registerCommand('local-tomcat.openDeployedDir', async () => {
+		let deployedApps = tomcat.getDeployedApps();
+		const choice = await vscode.window.showQuickPick(deployedApps);
+		vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(path.resolve(tomcat.catalinaHome, tomcat.webapps, choice)), true);
+
+	});
+
 	context.subscriptions.push(disposable, removeAllWARs, removeWar, openLogFile, clearWorkDir, runTomcat, stopTomcat,
-		runTomcatDebug, deployWar);
+		runTomcatDebug, deployWar, launchWebapp, openDeployedDir);
 }
 
 // this method is called when your extension is deactivated

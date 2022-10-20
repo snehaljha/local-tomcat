@@ -30,35 +30,27 @@ export class Deployer {
         return undefined;
     }
     
-    getTargetWarName(): string | undefined {
+    getTargetWarNames(): Array<string> | undefined {
         try {
             const fs = require('fs');
             let files = fs.readdirSync(this.warDir);
-            let warName = undefined;
+            let warNames = [];
             for(const f of files) {
                 if(f.endsWith('.war')) {
-                    warName = f;
-                    break;
+                    warNames.push(f.replace('.war', ''));
                 }
             }
-            if(!warName) {
-                return undefined;
-            }
-            return warName.replace('.war', '');
+            return warNames;
         } catch (ex) {
             console.log(ex);
         }
         return undefined;
     }
 
-    deployWar(contextName: string | undefined) : boolean {
+    deployWar(warName: string, contextName: string | undefined) : boolean {
         try {
-            let name = this.getTargetWarName();
             if(!contextName || contextName === '') {
-                if(!name) {
-                    name = '';
-                }
-                contextName = name + '.war';
+                contextName = warName.replace('.war', '');
             } else {
                 if(!contextName.endsWith('.war')) {
                     contextName += '.war';
@@ -68,7 +60,7 @@ export class Deployer {
             assert(contextName && contextName.trim() !== '.war');
 
             const fs = require('fs');
-            fs.copyFileSync(this.path.resolve(this.warDir, name+'.war'), this.path.resolve(this.webappDir, contextName));
+            fs.copyFileSync(this.path.resolve(this.warDir, warName), this.path.resolve(this.webappDir, contextName));
             return true;
         } catch (ex) {
             console.log(ex);
@@ -76,17 +68,9 @@ export class Deployer {
         return false;
     }
 
-    checkDeployedWar(contextName: string | undefined) : boolean {
-        if(!contextName || contextName === '') {
-            let name = this.getTargetWarName();
-            if(!name) {
-                name = '';
-            }
-            contextName = name + '.war';
-        } else {
-            if(!contextName.endsWith('.war')) {
-                contextName += '.war';
-            }
+    checkDeployedWar(contextName: string) : boolean {
+        if(!contextName.endsWith('.war')) {
+            contextName += '.war';
         }
 
         assert(contextName && contextName.trim() !== '.war');

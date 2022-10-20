@@ -2,7 +2,7 @@
   "name": "local-tomcat",
   "displayName": "Local Tomcat",
   "description": "Provides extra functionality in vs code using local configurable tomcat installation.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "engines": {
     "vscode": "^1.66.0"
   },
@@ -41,7 +41,9 @@
     "onCommand:local-tomcat.runTomcat",
     "onCommand:local-tomcat.stopTomcat",
     "onCommand:local-tomcat.runTomcatDebug",
-    "onCommand:local-tomcat.deployWar"
+    "onCommand:local-tomcat.deployWar",
+    "onCommand:local-tomcat.launchWebapp",
+    "onCommand:local-tomcat.openDeployedDir"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -55,6 +57,14 @@
           ],
           "default": null,
           "description": "Location of installed Tomcat Home"
+        },
+        "local-tomcat.deploymentPort": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "default": 8080,
+          "description": "Deployment port of tomcat"
         },
         "local-tomcat.warDir": {
           "type": "string",
@@ -99,6 +109,14 @@
       {
         "command": "local-tomcat.deployWar",
         "title": "LT: Deploy WAR"
+      },
+      {
+        "command": "local-tomcat.launchWebapp",
+        "title": "LT: Launch Webapp"
+      },
+      {
+        "command": "local-tomcat.openDeployedDir",
+        "title": "LT: Open Webapp Directory"
       }
     ]
   },
