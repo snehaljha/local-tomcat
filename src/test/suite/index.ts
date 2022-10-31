@@ -30,6 +30,7 @@ export function run(): Promise<void> {
 					}
 				});
 			} catch (err) {
+				//catch exception if thrown any
 				console.error(err);
 				e(err);
 			}
