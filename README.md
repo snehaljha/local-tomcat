@@ -1,7 +1,7 @@
 # Local Tomcat (LT)
 An extension to reduce open explorer windows or tabs and repetitive hassle to deploy and manage applications deployed on local tomcat.
        
-## Features
+## Features   
 After configuring required properties. It can deploy, remove and can even open logs within few key presses. Currently 9 commands are supported to make work easier.
 
 ![Available Commands](https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/commands.png)
