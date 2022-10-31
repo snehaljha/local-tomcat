@@ -7,6 +7,7 @@ import { TomcatLogs } from './util/tomcat-logs';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
+let outputChannel: vscode.OutputChannel;
 export function activate(context: vscode.ExtensionContext) {
 	
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
@@ -14,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "local-tomcat" is now active!');
 
 	const os = require('os');
-
+	
 	const catalinaScript = os.type() === 'Windows_NT' ? 'catalina.bat' : 'catalina.sh';
 	const filePathPrefix = os.type() === 'Windows_NT' ? 'file:///' : '';
 	const { spawn } = require("child_process");
@@ -57,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let tomcat = new Tomcat(env.catalinaHome);
 	let port = env.deploymentPort;
 	let tomcatLogs = new TomcatLogs(env.catalinaHome);
-	const outputChannel = vscode.window.createOutputChannel('Local Tomcat');
+	outputChannel = vscode.window.createOutputChannel('Local Tomcat');
 	let cwd;
 	try {
 		if(vscode.workspace.workspaceFolders) {
@@ -249,6 +250,9 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
-	vscode.commands.executeCommand('local-tomcat.stopTomcat');
+export async function deactivate() {
+	await vscode.commands.executeCommand('local-tomcat.stopTomcat');
+	if(outputChannel!== undefined) {
+		outputChannel.dispose();
+	}
 }
