@@ -18,7 +18,6 @@ After configuring required properties. It can deploy, remove and can even open l
 * LT: Launch Webapp - Will present an option to select deployed webapp which will be launched using browser.
 * LT: Open Webapp Directory - Will present an option to select deployed webapp which will open that deployed folder in separate vscode instance.
 
-
 ## Requirements
 
 * Local installed and working instance of tomcat.
@@ -40,12 +39,11 @@ Users appreciate release notes as you update your extension.
 
 ### 0.0.1
 
-Initial release.
+Initial release
 
 ### 0.1.0
 
 Added support for all platforms (Windows, Linux, Darwin).
-
 
 ### 0.2.0
 * Added multi-war deployement.
