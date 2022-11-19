@@ -163,7 +163,10 @@ export function activate(context: vscode.ExtensionContext) {
 			for(let i: number = 0; i< selectedWars.length; i++) {
 				let contextName = await vscode.window.showInputBox({prompt: (error ? 'Name already chosen for ' : 'App Context Name for ') + selectedWars[i], placeHolder: 'Leave empty for default name'});
 				error = false;
-				if(!contextName || contextName === '') {
+				if(contextName === undefined) {
+					continue;
+				}
+				if(contextName.trim() === '') {
 					contextName = selectedWars[i];
 				}
 				if(contextSet.includes(contextName)) {
@@ -192,6 +195,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		} else {
 			let contextName = await vscode.window.showInputBox({prompt: 'App Context Name', placeHolder: 'Leave empty for default name'});
+			contextName = contextName?.trim();
+			if(contextName === undefined) {
+				return;
+			}
 			const warPresent = deployer.checkDeployedWar(!contextName || contextName === '' ? targetappNames[0] : contextName);
 			if(warPresent) {
 				const options = ['Replace', 'Cancel'];
