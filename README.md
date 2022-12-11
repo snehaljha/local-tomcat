@@ -17,6 +17,7 @@ After configuring required properties. It can deploy, remove and can even open l
 * LT: Deploy WAR - Will deploy the war prompting for context name.
 * LT: Launch Webapp - Will present an option to select deployed webapp which will be launched using browser.
 * LT: Open Webapp Directory - Will present an option to select deployed webapp which will open that deployed folder in separate vscode instance.
+* LT: Change Tomcat Instance - Will present an option to change current instance with a list of configured valid instances.
 
 
 ## Requirements
@@ -30,13 +31,13 @@ The only required configuration are these two keys that can be added in settings
 
 ![Settings](https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/settings.png)
 
-* local-tomcat.catalinaHome (required) to be configured to tomcat home / catalina home.
 * local-tomcat.warDir (optional) will contain relative path to war directory. Default value is 'target'.
-* local-tomcat.deploymentPort (optional) tomcat port at which applications are accessible. Default value is 8080.
+* local-tomcat.tomcatInstances (required) list of instance objects with properties :-
+    - name (requried) Given name to the instance can be seen while making a choice or on status bar.
+    - catalinaHome (required) to be configured to tomcat home / catalina home.
+    - deploymentPort (optional) tomcat port at which applications are accessible. Default value is 8080.
 
 ## Release Notes
-
-Users appreciate release notes as you update your extension.
 
 ### 0.0.1
 
@@ -51,3 +52,9 @@ Added support for all platforms (Windows, Linux, Darwin).
 * Added multi-war deployement.
 * Added option to open deployed webapp directory.
 * Added option to launch webapp in browser.
+
+### 1.0.0
+* Added multiple instance support.
+* Added status bar button to view selected instance and change it.
+
+*** Settings have been changed ***

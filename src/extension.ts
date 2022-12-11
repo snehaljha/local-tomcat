@@ -1,254 +1,196 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import { Deployer } from './util/deployer';
-import { Tomcat } from './util/tomcat';
-import { TomcatLogs } from './util/tomcat-logs';
+import { commands, env, ExtensionContext, Uri, window, workspace } from 'vscode';
+import { spawn } from 'child_process';
+import path = require('path');
+import { ExtensionUtil } from './util/extension-util';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+let extensionUtil: ExtensionUtil;
+export function activate(context: ExtensionContext) {
 	
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "local-tomcat" is now active!');
+	extensionUtil = new ExtensionUtil();
 
-	const os = require('os');
-
-	const catalinaScript = os.type() === 'Windows_NT' ? 'catalina.bat' : 'catalina.sh';
-	const filePathPrefix = os.type() === 'Windows_NT' ? 'file:///' : '';
-	const { spawn } = require("child_process");
-
-	const path = require('path');
-	function tomcatRun(debugMode = false) {
-		if(tomcat.running) {
-			vscode.window.showInformationMessage('Tomcat is already running');
+	const verifyTomcat = commands.registerCommand('local-tomcat.verifyTomcat', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
 			return;
 		}
-		vscode.commands.executeCommand('local-tomcat.stopTomcat');
-		let cmd;
-		if(debugMode) {
-			cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ['jpda', 'run']);
-		} else {
-			cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ['run']);
-		}
-		tomcat.running = true;
-		outputChannel.appendLine('Starting tomcat');
-		cmd.stdout.on('data', (data: string) => {
-			outputChannel.appendLine(data);
-		});
-		cmd.stderr.on('data', (data: string) => {
-			outputChannel.appendLine(data);
-		});
-		cmd.on('error', (data: string) => {
-			outputChannel.appendLine(`error: ${data}`);
-		});
-		cmd.on('close', (code: string) => {
-			outputChannel.appendLine(`process exited with code ${code}`);
-			outputChannel.appendLine('Tomcat stopped');
-			tomcat.running = false;
-		});
-	}
-	
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let env = vscode.workspace.getConfiguration('local-tomcat');
-	let tomcat = new Tomcat(env.catalinaHome);
-	let port = env.deploymentPort;
-	let tomcatLogs = new TomcatLogs(env.catalinaHome);
-	const outputChannel = vscode.window.createOutputChannel('Local Tomcat');
-	let cwd;
-	try {
-		if(vscode.workspace.workspaceFolders) {
-			cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
-		} else {
-			cwd = '';
-		}
-	} catch (ex) {
-		console.log(ex);
-		cwd = '';
-	}
-	let deployer = new Deployer(cwd, env.catalinaHome, env.warDir);
-
-	let disposable = vscode.commands.registerCommand('local-tomcat.verifyTomcat', () => {
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
 		console.log('using ' + tomcat.catalinaHome + ' as catalina Home');
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
 		
 		let status = tomcat.verifyHome();
 		if(status) {
-			vscode.window.showInformationMessage('valid tomcat directory');
+			window.showInformationMessage('valid tomcat directory');
 		} else {
-			vscode.window.showErrorMessage('catalina home is invalid');
+			window.showErrorMessage('catalina home is invalid');
 		}
 	});
 
-	let removeAllWARs = vscode.commands.registerCommand('local-tomcat.removeAllWARs', () => {
+	const removeAllWARs = commands.registerCommand('local-tomcat.removeAllWARs', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
 		let status = tomcat.removeAllWars();
 		if(status) {
-			vscode.window.showInformationMessage('Removed All wars');
+			window.showInformationMessage('Removed All wars');
 		} else {
-			vscode.window.showErrorMessage('Failed to remove wars');
+			window.showErrorMessage('Failed to remove wars');
 		}
 	});
 
-	let removeWar = vscode.commands.registerCommand('local-tomcat.removeWAR', async () => {
+	const removeWar = commands.registerCommand('local-tomcat.removeWAR', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
 		let deployedWars = tomcat.getDeployedWars();
-		let selectedWars = await vscode.window.showQuickPick(deployedWars, {canPickMany: true});
+		let selectedWars = await window.showQuickPick(deployedWars, {canPickMany: true});
 		console.log('selected wars ', selectedWars);
 		let status = tomcat.removeWars(selectedWars);
 		if(status) {
-			vscode.window.showInformationMessage('Removed war(s)');
+			window.showInformationMessage('Removed war(s)');
 		} else if(status === false) {
-			vscode.window.showErrorMessage('Failed to remove war(s)');
+			window.showErrorMessage('Failed to remove war(s)');
 		}
 	});
 
-	let openLogFile = vscode.commands.registerCommand('local-tomcat.openLogFile', async () => {
-		const options = tomcatLogs.getFilePatterns();
-		const selectedLogFile = await vscode.window.showQuickPick(options);
-		const filePath = tomcatLogs.getLogFilePath(selectedLogFile+'.');
+	const openLogFile = commands.registerCommand('local-tomcat.openLogFile', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
+		const options = tomcat.tomcatLogs.getFilePatterns();
+		const selectedLogFile = await window.showQuickPick(options);
+		const filePath = tomcat.tomcatLogs.getLogFilePath(selectedLogFile+'.');
 
-		var openPath = vscode.Uri.parse(filePathPrefix + filePath); //A request file path
-		vscode.workspace.openTextDocument(openPath).then(doc => {
-			vscode.window.showTextDocument(doc);
+		var openPath = Uri.parse(extensionUtil.filePathPrefix + filePath); //A request file path
+		workspace.openTextDocument(openPath).then(doc => {
+			window.showTextDocument(doc);
 		});
 	});
 
-	let clearWorkDir = vscode.commands.registerCommand('local-tomcat.clearWorkDir', () => {
+	const clearWorkDir = commands.registerCommand('local-tomcat.clearWorkDir', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
 		const status = tomcat.clearWork();
 		if(status) {
-			vscode.window.showInformationMessage('Work Directory cleared');
+			window.showInformationMessage('Work Directory cleared');
 		} else {
-			vscode.window.showErrorMessage('Failed to clear work directory');
+			window.showErrorMessage('Failed to clear work directory');
 		}
 	});
 
-	let runTomcat = vscode.commands.registerCommand('local-tomcat.runTomcat', async () => {
-		tomcatRun();
-	});
+	const runTomcat = commands.registerCommand('local-tomcat.runTomcat', extensionUtil.tomcatRun);
 
-	let stopTomcat = vscode.commands.registerCommand('local-tomcat.stopTomcat', () => {
-		const { spawn } = require("child_process");
-		spawn(path.resolve(tomcat.catalinaHome, 'bin', catalinaScript), ["stop"]);
+	const stopTomcat = commands.registerCommand('local-tomcat.stopTomcat', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
+		spawn(path.resolve(tomcat.catalinaHome, 'bin', extensionUtil.catalinaScript), ["stop"]);
 		tomcat.running = false;
 	});
 
-	let runTomcatDebug = vscode.commands.registerCommand('local-tomcat.runTomcatDebug', () => {
-		tomcatRun(true);
-	});
+	const runTomcatDebug = commands.registerCommand('local-tomcat.runTomcatDebug', () => extensionUtil.tomcatRun(true));
 
-	let deployWar = vscode.commands.registerCommand('local-tomcat.deployWar', async () => {
-		const validity = deployer.verifyDeployer();
+	const deployWar = commands.registerCommand('local-tomcat.deployWar', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
+
+		const validity = tomcat.deployer.verifyDeployer();
 		if(validity) {
-			vscode.window.showErrorMessage(validity);
+			window.showErrorMessage(validity);
 			return;
 		}
-		let targetappNames = deployer.getTargetWarNames();
+		let targetappNames = tomcat.deployer.getTargetWarNames();
 		if(!targetappNames || targetappNames?.length === 0) {
-			vscode.window.showErrorMessage('No war Available');
+			window.showErrorMessage('No war Available');
 			return;
 		}
 
-		let overallStatus = false;
+		let status = false;
 		if(targetappNames.length > 1) {
-			let selectedWars = await vscode.window.showQuickPick(targetappNames, {canPickMany: true});
-			if(!selectedWars) {
-				selectedWars = [];
-			}
-			let contextSet: Array<string> = [];
-			let error = false;
-			for(let i: number = 0; i< selectedWars.length; i++) {
-				let contextName = await vscode.window.showInputBox({prompt: (error ? 'Name already chosen for ' : 'App Context Name for ') + selectedWars[i], placeHolder: 'Leave empty for default name'});
-				error = false;
-				if(!contextName || contextName === '') {
-					contextName = selectedWars[i];
-				}
-				if(contextSet.includes(contextName)) {
-					error = true;
-					i--;
-				}
-				contextSet.push(contextName);
-				const warPresent = deployer.checkDeployedWar(contextName);
-				if(warPresent) {
-					const options = ['Replace ' + selectedWars[i], 'Cancel'];
-					const choice = await vscode.window.showQuickPick(options);
-					if(choice !== options[0]) {
-						continue;
-					}
-					tomcat.removeWars([contextName+'.war']);
-				}
-				const status = deployer.deployWar(selectedWars[i]+'.war', contextName);
-				if(!status) {
-					vscode.window.showErrorMessage(`Deployement of ${contextName} failed`);
-				} else {
-					overallStatus = true;
-				}
-			}
-
-
-
+			status = await extensionUtil.deployMultipleWars(tomcat, targetappNames);
 		} else {
-			let contextName = await vscode.window.showInputBox({prompt: 'App Context Name', placeHolder: 'Leave empty for default name'});
-			const warPresent = deployer.checkDeployedWar(!contextName || contextName === '' ? targetappNames[0] : contextName);
-			if(warPresent) {
-				const options = ['Replace', 'Cancel'];
-				const choice = await vscode.window.showQuickPick(options);
-				if(choice !== options[0]) {
-					return;
-				}
-				tomcat.removeWars([contextName+'.war']);
-			}
-			const status = deployer.deployWar(targetappNames[0]+'.war', contextName);
-			if(!status) {
-				vscode.window.showErrorMessage('Deployement of war failed');
-			}
-			overallStatus = status;
+			status = await extensionUtil.deploySingleWar(tomcat, targetappNames[0]);
 		}
 
-		if(!overallStatus) {
+		if(!status) {
 			return;
 		}
 
 
-		vscode.window.showInformationMessage('Moved war package(s)');
+		window.showInformationMessage('Moved war package(s)');
 
 		if(!tomcat.running) {
 			const options = ['Run tomcat', 'Run tomcat in debug mode'];
-			const choice = await vscode.window.showQuickPick(options);
+			const choice = await window.showQuickPick(options);
 			if(choice === options[0]) {
-				tomcatRun();
+				extensionUtil.tomcatRun();
 			} else if(choice === options[1]){
-				tomcatRun(true);
+				extensionUtil.tomcatRun(true);
 			}
+			tomcat.running = true;
 		}
 	});
 
-	let launchWebapp = vscode.commands.registerCommand('local-tomcat.launchWebapp', async () => {
+	const launchWebapp = commands.registerCommand('local-tomcat.launchWebapp', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
 		if(!tomcat.running) {
-			vscode.window.showInformationMessage('Tomcat is not running');
+			window.showInformationMessage('Tomcat is not running');
 			return;
 		}
 		let deployedApps = tomcat.getDeployedApps();
-		const choice = await vscode.window.showQuickPick(deployedApps);
+		const choice = await window.showQuickPick(deployedApps);
 
-		vscode.env.openExternal(vscode.Uri.parse('http://localhost:' + port + '/' + choice));
+		env.openExternal(Uri.parse('http://localhost:' + tomcat.deploymentPort + '/' + choice));
 
 	});
 
-	let openDeployedDir = vscode.commands.registerCommand('local-tomcat.openDeployedDir', async () => {
+	const openDeployedDir = commands.registerCommand('local-tomcat.openDeployedDir', async () => {
+		if(extensionUtil.selectedInstance === undefined) {
+			extensionUtil.showNoTomcatDialog();
+			return;
+		}
+		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
 		let deployedApps = tomcat.getDeployedApps();
-		const choice = await vscode.window.showQuickPick(deployedApps);
-		vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(path.resolve(tomcat.catalinaHome, tomcat.webapps, choice)), true);
+		let choice = await window.showQuickPick(deployedApps);
+		if(choice === undefined) {
+			choice = '';
+		}
+		commands.executeCommand("vscode.openFolder", Uri.file(path.resolve(tomcat.catalinaHome, tomcat.webapps, choice)), true);
 
 	});
 
-	context.subscriptions.push(disposable, removeAllWARs, removeWar, openLogFile, clearWorkDir, runTomcat, stopTomcat,
-		runTomcatDebug, deployWar, launchWebapp, openDeployedDir);
+	const changeSelectedTomcat = commands.registerCommand('local-tomcat.changeSelectedTomcat', extensionUtil.changeTomcat);
+
+	context.subscriptions.push(verifyTomcat, removeAllWARs, removeWar, openLogFile, clearWorkDir, runTomcat, stopTomcat,
+		runTomcatDebug, deployWar, launchWebapp, openDeployedDir, changeSelectedTomcat, extensionUtil.statusBarSelector);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {
-	vscode.commands.executeCommand('local-tomcat.stopTomcat');
+export async function deactivate() {
+	await commands.executeCommand('local-tomcat.stopTomcat');
+	extensionUtil.disposeOutputChannels();
 }
