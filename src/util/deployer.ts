@@ -52,7 +52,7 @@ export class Deployer {
     deployWar(warName: string, contextName: string | undefined) : boolean {
         try {
             if(!contextName || contextName === '') {
-                contextName = warName.replace('.war', '');
+                contextName = warName;
             } else {
                 if(!contextName.endsWith('.war')) {
                     contextName += '.war';

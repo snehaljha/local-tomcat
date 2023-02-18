@@ -41,7 +41,7 @@ The only required configuration are these two keys that can be added in settings
 
 ### 0.0.1
 
-Initial release
+Initial release.
 
 ### 0.1.0
 
