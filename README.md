@@ -2,22 +2,22 @@
 An extension to reduce open explorer windows or tabs and repetitive hassle to deploy and manage applications deployed on local tomcat.
 
 ## Features
-After configuring required properties. It can deploy, remove and can even open logs within few key presses. Currently 9 commands are supported to make work easier.
+After configuring required properties. It can deploy, remove and can even open logs within few key presses. Currently *12* commands are supported to make work easier.
 
-![Available Commands](https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/commands.png)
+![Available Commands](img/commands.png)
 
-* LT: Verify Tomcat - Will verify the location of tomcat home / catalina home.
-* LT: Remove All wars - Will remove all the deployed war from tomcat instance.
-* LT: Remove War - Will ask prompt to select the war to be removed.
-* LT: Open Log File - Will prompt to open different kinds of latest log file.
-* LT: Clear Work Directory - Will clear work directory to remove any cache causing any sort of problem.
-* LT: Run Tomcat - Will run the tomcat instance in its configured port if its not already running.
-* LT: Stop Tomcat - Will stop the tomcat instance if it is running.
-* LT: Run Tomcat in Debug Mode - Will run the tomcat in debug mode in its configured port if its not already running.
-* LT: Deploy WAR - Will deploy the war prompting for context name.
-* LT: Launch Webapp - Will present an option to select deployed webapp which will be launched using browser.
-* LT: Open Webapp Directory - Will present an option to select deployed webapp which will open that deployed folder in separate vscode instance.
-* LT: Change Tomcat Instance - Will present an option to change current instance with a list of configured valid instances.
+* **LT: Verify Tomcat** - Will verify the location of tomcat home / catalina home.
+* **LT: Remove All wars** - Will remove all the deployed war from tomcat instance.
+* **LT: Remove War** - Will ask prompt to select the war to be removed.
+* **LT: Open Log File** - Will prompt to open different kinds of latest log file.
+* **LT: Clear Work Directory** - Will clear work directory to remove any cache causing any sort of problem.
+* **LT: Run Tomcat** - Will run the tomcat instance in its configured port if its not already running.
+* **LT: Stop Tomcat** - Will stop the tomcat instance if it is running.
+* **LT: Run Tomcat in Debug Mode** - Will run the tomcat in debug mode in its configured port if its not already running.
+* **LT: Deploy WAR** - Will deploy the war prompting for context name.
+* **LT: Launch Webapp** - Will present an option to select deployed webapp which will be launched using browser.
+* **LT: Open Webapp Directory** - Will present an option to select deployed webapp which will open that deployed folder in separate vscode instance.
+* **LT: Change Tomcat Instance** - Will present an option to change current instance with a list of configured valid instances.
 
 
 ## Requirements
@@ -57,4 +57,4 @@ Added support for all platforms (Windows, Linux, Darwin).
 * Added multiple instance support.
 * Added status bar button to view selected instance and change it.
 
-*** Settings have been changed ***
+>***Settings have been changed***
