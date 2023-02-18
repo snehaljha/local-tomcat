@@ -138,6 +138,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "package": "vsce package",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
@@ -155,7 +156,8 @@
     "eslint": "^8.11.0",
     "glob": "^7.2.0",
     "mocha": "^9.2.2",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "@vscode/vsce": "^2.17.0"
   },
   "dependencies": {
     "os-file-handler": "^1.4.1"
