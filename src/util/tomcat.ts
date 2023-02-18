@@ -103,7 +103,7 @@ export class Tomcat {
 
     removeWars(selectedWars: string[] | undefined): boolean | undefined {
         if(!selectedWars) {
-            return undefined;
+            return true;
         }
 
         try {
@@ -177,6 +177,8 @@ export class Tomcat {
         if(this.outputChannel === undefined) {
             return;
         }
+        this.outputChannel.clear();
+        this.outputChannel.hide();
         this.outputChannel.dispose();
     }
 }

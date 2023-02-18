@@ -164,6 +164,10 @@ export function activate(context: ExtensionContext) {
 		let deployedApps = tomcat.getDeployedApps();
 		const choice = await window.showQuickPick(deployedApps);
 
+		if(!choice) {
+			return;
+		}
+
 		env.openExternal(Uri.parse('http://localhost:' + tomcat.deploymentPort + '/' + choice));
 
 	});
@@ -177,7 +181,7 @@ export function activate(context: ExtensionContext) {
 		let deployedApps = tomcat.getDeployedApps();
 		let choice = await window.showQuickPick(deployedApps);
 		if(choice === undefined) {
-			choice = '';
+			return;
 		}
 		commands.executeCommand("vscode.openFolder", Uri.file(path.resolve(tomcat.catalinaHome, tomcat.webapps, choice)), true);
 
@@ -191,6 +195,6 @@ export function activate(context: ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export async function deactivate() {
-	await commands.executeCommand('local-tomcat.stopTomcat');
 	extensionUtil.disposeOutputChannels();
+	extensionUtil.stopTomcats();
 }

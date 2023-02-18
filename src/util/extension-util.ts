@@ -217,4 +217,16 @@ export class ExtensionUtil {
         window.showErrorMessage(NO_INSTANCE_CONFIGURED);
     };
 
+    stopTomcats = () => {
+        if(this.tomcatInstances === undefined) {
+            return;
+        }
+
+        for(let instance of this.tomcatInstances) {
+            if(instance.running) {
+                spawn(path.resolve(instance.catalinaHome, 'bin', this.catalinaScript), ["stop"]);
+            }
+        }
+	};
+
 }
