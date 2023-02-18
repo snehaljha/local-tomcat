@@ -1,4 +1,4 @@
-# Local Tomcat (LT)
+# <img src="img/local-tomcat.png" alt="" height="40" />Local Tomcat (LT)
 An extension to reduce open explorer windows or tabs and repetitive hassle to deploy and manage applications deployed on local tomcat.
 
 ## Features
@@ -29,7 +29,7 @@ After configuring required properties. It can deploy, remove and can even open l
 
 The only required configuration are these two keys that can be added in settings.json
 
-![Settings](https://raw.githubusercontent.com/snehaljha/local-tomcat/main/img/settings.png)
+![Settings](img/settings.png)
 
 * local-tomcat.warDir (optional) will contain relative path to war directory. Default value is 'target'.
 * local-tomcat.tomcatInstances (required) list of instance objects with properties :-
