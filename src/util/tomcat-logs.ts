@@ -1,10 +1,11 @@
+import path = require('path');
+
 export class TomcatLogs {
     private logPath: string;
-    private path = require('path');
 
-    constructor(path: string| undefined) {
-        if(path) {
-            this.logPath = this.path.resolve(path, 'logs');
+    constructor(logPath: string| undefined) {
+        if(logPath) {
+            this.logPath = path.resolve(logPath, 'logs');
         } else {
             this.logPath = '';
         }
@@ -23,7 +24,7 @@ export class TomcatLogs {
             return '';
         }
         rfiles = rfiles.sort();
-        return this.path.resolve(this.logPath, rfiles[rfiles.length-1]);
+        return path.resolve(this.logPath, rfiles[rfiles.length-1]);
     }
 
     getFilePatterns(): string[] {

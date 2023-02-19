@@ -1,21 +1,23 @@
 import { assert } from "console";
+import path = require('path');
 
 export class Deployer {
     warDir: string;
     webappDir: string;
-    private path = require('path');
     
     constructor(cwd: string, homeDir: string, warLoc: string) {
-        if(cwd === '' || warLoc.trim() === '' || warLoc === undefined) {
+
+        console.log(cwd, homeDir, warLoc);
+        if(cwd === '' || warLoc === undefined || warLoc.trim() === '') {
             this.warDir = '';
         } else {
-            this.warDir = this.path.resolve(cwd, warLoc);
+            this.warDir = path.resolve(cwd, warLoc);
         }
 
         if(homeDir.trim() === '' || homeDir === undefined) {
             this.webappDir = '';
         } else {
-            this.webappDir = this.path.resolve(homeDir, 'webapps'); 
+            this.webappDir = path.resolve(homeDir, 'webapps'); 
         }
     }
     
@@ -60,7 +62,7 @@ export class Deployer {
             assert(contextName && contextName.trim() !== '.war');
 
             const fs = require('fs');
-            fs.copyFileSync(this.path.resolve(this.warDir, warName), this.path.resolve(this.webappDir, contextName));
+            fs.copyFileSync(path.resolve(this.warDir, warName), path.resolve(this.webappDir, contextName));
             return true;
         } catch (ex) {
             console.log(ex);

@@ -2,7 +2,7 @@
   "name": "local-tomcat",
   "displayName": "Local Tomcat",
   "description": "Provides extra functionality in vs code using local configurable tomcat installation.",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.66.0"
   },
@@ -33,6 +33,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onStartupFinished",
     "onCommand:local-tomcat.verifyTomcat",
     "onCommand:local-tomcat.removeAllWARs",
     "onCommand:local-tomcat.removeWAR",
@@ -43,28 +44,39 @@
     "onCommand:local-tomcat.runTomcatDebug",
     "onCommand:local-tomcat.deployWar",
     "onCommand:local-tomcat.launchWebapp",
-    "onCommand:local-tomcat.openDeployedDir"
+    "onCommand:local-tomcat.openDeployedDir",
+    "onCommand:local-tomcat.changeSelectedTomcat"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
       "title": "LocalTomcat",
+      "required": ["local-tomcat.tomcatInstances"],
       "properties": {
-        "local-tomcat.catalinaHome": {
-          "type": [
-            "string",
-            "null"
-          ],
+        "local-tomcat.tomcatInstances": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "title": "Tomcat Instance",
+            "required": ["name", "catalinaHome"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of Instance"
+              },
+              "catalinaHome": {
+                "type": "string",
+                "description": "Catalina home of the instance"
+              },
+              "deploymentPort": {
+                "type": "number",
+                "description": "Deployment port of tomcat",
+                "default": 8080
+              }
+            }
+          },
           "default": null,
-          "description": "Location of installed Tomcat Home"
-        },
-        "local-tomcat.deploymentPort": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "default": 8080,
-          "description": "Deployment port of tomcat"
+          "description": "Installed Tomcat Instances"
         },
         "local-tomcat.warDir": {
           "type": "string",
@@ -117,11 +129,16 @@
       {
         "command": "local-tomcat.openDeployedDir",
         "title": "LT: Open Webapp Directory"
+      },
+      {
+        "command": "local-tomcat.changeSelectedTomcat",
+        "title": "LT: Change Tomcat Instance"
       }
     ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "package": "vsce package",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
@@ -139,7 +156,8 @@
     "eslint": "^8.11.0",
     "glob": "^7.2.0",
     "mocha": "^9.2.2",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "@vscode/vsce": "^2.17.0"
   },
   "dependencies": {
     "os-file-handler": "^1.4.1"
