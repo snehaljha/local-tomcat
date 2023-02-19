@@ -146,6 +146,8 @@ export function activate(context: ExtensionContext) {
 				extensionUtil.tomcatRun();
 			} else if(choice === options[1]){
 				extensionUtil.tomcatRun(true);
+			} else {
+				return;
 			}
 			tomcat.running = true;
 		}

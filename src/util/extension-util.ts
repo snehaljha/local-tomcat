@@ -160,6 +160,9 @@ export class ExtensionUtil {
         } else {
             contextName = ctxtName;
         }
+        if(contextName === undefined) {
+            return false;
+        }
         contextName = !contextName || contextName === '' ? targetAppName : contextName;
         const warPresent = tomcat.deployer.checkDeployedWar(contextName);
         if(warPresent) {
@@ -192,16 +195,22 @@ export class ExtensionUtil {
             while(true) {
                 contextName = await window.showInputBox({prompt: (error ? 'Name already chosen for ' : 'App Context Name for ') + selectedWar, placeHolder: 'Leave empty for default name'});
                 error = true;
-                if(!contextName || contextName === '') {
+                if(contextName === undefined) {
+                    break;
+                }
+                if(contextName === '') {
                     contextName = selectedWar;
                 }
                 if(!contextSet.includes(contextName)) {
                     break;
                 }
             }
-            contextSet.push(contextName);
 
-            overallStatus = await this.deploySingleWar(tomcat, selectedWar, contextName);
+            if(contextName) {
+                contextSet.push(contextName);
+
+                overallStatus = await this.deploySingleWar(tomcat, selectedWar, contextName);
+            }
         }
 
         return overallStatus;
