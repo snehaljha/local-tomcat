@@ -20,6 +20,7 @@ export class ExtensionUtil {
     catalinaScript;
     selectedInstance;
     statusBarSelector: StatusBarItem;
+    terminalMode = true;
 
     constructor() {
         this.env = workspace.getConfiguration('local-tomcat');
@@ -128,24 +129,33 @@ export class ExtensionUtil {
             return;
         }
         commands.executeCommand('local-tomcat.stopTomcat');
+
         let cmd;
         if(debugMode) {
-            cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript), ['jpda', 'run']);
+            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + 'jpda run';
         } else {
-            cmd = spawn(path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript), ['run']);
+            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + 'run';
         }
+        if(this.terminalMode) {
+            const terminal = window.createTerminal('Local-Tomcat');
+            terminal.sendText(cmd);
+            tomcat.running = true; 
+            return;   
+        }
+
+        const proc = spawn(cmd, {shell: true});
         tomcat.running = true;
         tomcat.getOutputChannel().appendLine('Starting tomcat');
-        cmd.stdout.on('data', (data: string) => {
+        proc.stdout.on('data', (data: string) => {
             tomcat.getOutputChannel().appendLine(data);
         });
-        cmd.stderr.on('data', (data: string) => {
+        proc.stderr.on('data', (data: string) => {
             tomcat.getOutputChannel().appendLine(data);
         });
-        cmd.on('error', (data: string) => {
+        proc.on('error', (data: string) => {
             tomcat.getOutputChannel().appendLine(`error: ${data}`);
         });
-        cmd.on('close', (code: string) => {
+        proc.on('close', (code: string) => {
             tomcat.getOutputChannel().appendLine(`process exited with code ${code}`);
             tomcat.getOutputChannel().appendLine('Tomcat stopped');
             tomcat.running = false;
@@ -233,7 +243,7 @@ export class ExtensionUtil {
 
         for(let instance of this.tomcatInstances) {
             if(instance.running) {
-                spawn(path.resolve(instance.catalinaHome, 'bin', this.catalinaScript), ["stop"]);
+                spawn(path.resolve(instance.catalinaHome, 'bin', this.catalinaScript), ["stop"], {shell: true});
             }
         }
 	};
