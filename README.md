@@ -36,6 +36,7 @@ The only required configuration are these two keys that can be added in settings
     - name (requried) Given name to the instance can be seen while making a choice or on status bar.
     - catalinaHome (required) to be configured to tomcat home / catalina home.
     - deploymentPort (optional) tomcat port at which applications are accessible. Default value is 8080.
+* local-tomcat.terminalMode (optional) If enabled, will run commands in terminal rather than using an output channel. Default value is false.
 
 ## Release Notes
 
@@ -56,5 +57,9 @@ Added support for all platforms (Windows, Linux, Darwin).
 ### 1.0.0
 * Added multiple instance support.
 * Added status bar button to view selected instance and change it.
+
+### 2.0.0
+* Fixed spawn EINVAL error
+* Added support to run commands in separate terminal instead of output channel
 
 >***Settings have been changed***

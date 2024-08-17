@@ -2,7 +2,7 @@
   "name": "local-tomcat",
   "displayName": "Local Tomcat",
   "description": "Provides extra functionality in vs code using local configurable tomcat installation.",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "engines": {
     "vscode": "^1.66.0"
   },
@@ -82,6 +82,11 @@
           "type": "string",
           "default": "target",
           "description": "Directory which contain war package"
+        },
+        "local-tomcat.terminalMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Terminal execution for commands (defaults to false - output channel)"
         }
       }
     },
