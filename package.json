@@ -82,6 +82,11 @@
           "type": "string",
           "default": "target",
           "description": "Directory which contain war package"
+        },
+        "local-tomcat.terminalMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Terminal execution for commands (defaults to false - output channel)"
         }
       }
     },

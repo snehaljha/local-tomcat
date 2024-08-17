@@ -20,10 +20,11 @@ export class ExtensionUtil {
     catalinaScript;
     selectedInstance;
     statusBarSelector: StatusBarItem;
-    terminalMode = true;
+    terminalMode;
 
     constructor() {
         this.env = workspace.getConfiguration('local-tomcat');
+        this.terminalMode = this.env.terminalMode;
         try {
             if(workspace.workspaceFolders) {
                 this.cwd = workspace.workspaceFolders[0].uri.fsPath;
@@ -124,7 +125,7 @@ export class ExtensionUtil {
             return;
         }
         const tomcat = this.tomcatInstances[this.selectedInstance];
-        if(tomcat.running) {
+        if(!this.terminalMode && tomcat.running) {
             window.showInformationMessage('Tomcat is already running');
             return;
         }
@@ -132,9 +133,9 @@ export class ExtensionUtil {
 
         let cmd;
         if(debugMode) {
-            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + 'jpda run';
+            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + ' jpda run';
         } else {
-            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + 'run';
+            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + ' run';
         }
         if(this.terminalMode) {
             const terminal = window.createTerminal('Local-Tomcat');
