@@ -101,7 +101,7 @@ export function activate(context: ExtensionContext) {
 			return;
 		}
 		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
-		spawn(path.resolve(tomcat.catalinaHome, 'bin', extensionUtil.catalinaScript), ["stop"]);
+		spawn(extensionUtil.catalinaScript, ["stop"], {shell: true, cwd: path.resolve(tomcat.catalinaHome, 'bin')});
 		tomcat.running = false;
 	});
 

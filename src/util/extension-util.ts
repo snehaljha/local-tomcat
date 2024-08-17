@@ -38,7 +38,7 @@ export class ExtensionUtil {
         this.tomcatInstances = this.initTomcatInstances();
         this.selectedInstance = this.tomcatInstances.length === 0 ? undefined : 0;
         this.filePathPrefix = os.type() === 'Windows_NT' ? 'file:///' : '';
-        this.catalinaScript = os.type() === 'Windows_NT' ? 'catalina.bat' : 'catalina.sh';
+        this.catalinaScript = os.type() === 'Windows_NT' ? '.\\catalina.bat' : './catalina.sh';
         this.statusBarSelector = window.createStatusBarItem(StatusBarAlignment.Right);
         this.statusBarSelector.command = 'local-tomcat.changeSelectedTomcat';
         this.statusBarSelector.hide();
@@ -133,18 +133,19 @@ export class ExtensionUtil {
 
         let cmd;
         if(debugMode) {
-            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + ' jpda run';
+            cmd = this.catalinaScript + ' jpda run';
         } else {
-            cmd = path.resolve(tomcat.catalinaHome, 'bin', this.catalinaScript) + ' run';
+            cmd = this.catalinaScript + ' run';
         }
         if(this.terminalMode) {
             const terminal = window.createTerminal('Local-Tomcat');
+            terminal.sendText(`cd ${path.resolve(tomcat.catalinaHome, 'bin')}`);
             terminal.sendText(cmd);
             tomcat.running = true; 
             return;   
         }
 
-        const proc = spawn(cmd, {shell: true});
+        const proc = spawn(cmd, {shell: true, cwd: path.resolve(tomcat.catalinaHome, 'bin')});
         tomcat.running = true;
         tomcat.getOutputChannel().appendLine('Starting tomcat');
         proc.stdout.on('data', (data: string) => {
@@ -244,7 +245,7 @@ export class ExtensionUtil {
 
         for(let instance of this.tomcatInstances) {
             if(instance.running) {
-                spawn(path.resolve(instance.catalinaHome, 'bin', this.catalinaScript), ["stop"], {shell: true});
+                spawn(this.catalinaScript, ['stop'], {shell: true, cwd: path.resolve(instance.catalinaHome, 'bin')});
             }
         }
 	};
