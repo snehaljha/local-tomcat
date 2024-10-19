@@ -72,6 +72,10 @@
                 "type": "number",
                 "description": "Deployment port of tomcat",
                 "default": 8080
+              },
+              "javaHome": {
+                "type": "string",
+                "description": "java home to use for this tomcat"
               }
             }
           },
