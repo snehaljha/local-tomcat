@@ -15,14 +15,14 @@ export class Tomcat {
     private outputChannel: OutputChannel | undefined;
     deployer: Deployer;
     
-    constructor(name: string, homeDir: string, deploymentPort: number, cwd: string, warDir: string, public javaHome: string) {
+    constructor(name: string, homeDir: string, deploymentPort: number, cwd: string, warDir: string, public javaHome: string, customLogs: LogLocation[]) {
         this.catalinaHome = homeDir;
         this.name = name;
         this.deploymentPort = deploymentPort;
         this.bin = 'bin';
         this.webapps = 'webapps';
         this.running = false;
-        this.tomcatLogs = new TomcatLogs(this.catalinaHome);
+        this.tomcatLogs = new TomcatLogs(this.catalinaHome, customLogs);
         this.outputChannel = undefined;
         this.deployer = new Deployer(cwd, this.catalinaHome, warDir);
     }
