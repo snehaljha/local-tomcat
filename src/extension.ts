@@ -69,9 +69,9 @@ export function activate(context: ExtensionContext) {
 			return;
 		}
 		const tomcat = extensionUtil.tomcatInstances[extensionUtil.selectedInstance];
-		const options = tomcat.tomcatLogs.getFilePatterns();
+		const options = tomcat.tomcatLogs.getFileNames();
 		const selectedLogFile = await window.showQuickPick(options);
-		const filePath = tomcat.tomcatLogs.getLogFilePath(selectedLogFile+'.');
+		const filePath = tomcat.tomcatLogs.getLogFilePath(selectedLogFile);
 
 		var openPath = Uri.parse(extensionUtil.filePathPrefix + filePath); //A request file path
 		workspace.openTextDocument(openPath).then(doc => {

@@ -66,7 +66,7 @@ export class ExtensionUtil {
                 continue;
             }
 
-            tomcats.push(new Tomcat(instanceDetails.name, instanceDetails.catalinaHome, instanceDetails.deploymentPort, this.cwd, this.env.warDir, instanceDetails.javaHome));
+            tomcats.push(new Tomcat(instanceDetails.name, instanceDetails.catalinaHome, instanceDetails.deploymentPort, this.cwd, this.env.warDir, instanceDetails.javaHome, instanceDetails.logs));
         }
 
         if(tomcats.length === 0) {
