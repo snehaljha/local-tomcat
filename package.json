@@ -72,6 +72,24 @@
                 "type": "number",
                 "description": "Deployment port of tomcat",
                 "default": 8080
+              },
+              "logs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "title": "Log Locations",
+                  "required": ["name", "path"],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of log (to be presented as an option)"
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "Log file path"
+                    }
+                  }
+                }
               }
             }
           },
