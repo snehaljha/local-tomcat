@@ -15,7 +15,7 @@ export class Tomcat {
     private outputChannel: OutputChannel | undefined;
     deployer: Deployer;
     
-    constructor(name: string, homeDir: string, deploymentPort: number, cwd: string, warDir: string, customLogs: LogLocation[]) {
+    constructor(name: string, homeDir: string, deploymentPort: number, cwd: string, warDir: string, public javaHome: string, customLogs: LogLocation[]) {
         this.catalinaHome = homeDir;
         this.name = name;
         this.deploymentPort = deploymentPort;

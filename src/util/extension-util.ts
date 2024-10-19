@@ -66,7 +66,7 @@ export class ExtensionUtil {
                 continue;
             }
 
-            tomcats.push(new Tomcat(instanceDetails.name, instanceDetails.catalinaHome, instanceDetails.deploymentPort, this.cwd, this.env.warDir, instanceDetails.logs));
+            tomcats.push(new Tomcat(instanceDetails.name, instanceDetails.catalinaHome, instanceDetails.deploymentPort, this.cwd, this.env.warDir, instanceDetails.javaHome, instanceDetails.logs));
         }
 
         if(tomcats.length === 0) {
@@ -145,7 +145,7 @@ export class ExtensionUtil {
             return;   
         }
 
-        const proc = spawn(cmd, {shell: true, cwd: path.resolve(tomcat.catalinaHome, 'bin')});
+        const proc = spawn(cmd, {shell: true, cwd: path.resolve(tomcat.catalinaHome, 'bin'), env: {...process.env,  ...(tomcat.javaHome?{JAVA_HOME: tomcat.javaHome}:{})}});
         tomcat.running = true;
         tomcat.getOutputChannel().appendLine('Starting tomcat');
         proc.stdout.on('data', (data: string) => {
