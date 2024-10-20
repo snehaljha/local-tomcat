@@ -138,8 +138,7 @@ export class ExtensionUtil {
             cmd = this.catalinaScript + ' run';
         }
         if(this.terminalMode) {
-            const terminal = window.createTerminal('Local-Tomcat');
-            terminal.sendText(`cd ${path.resolve(tomcat.catalinaHome, 'bin')}`);
+            const terminal = window.createTerminal({name: 'Local-Tomcat', cwd: path.resolve(tomcat.catalinaHome, 'bin'), env: {...process.env,  ...(tomcat.javaHome?{JAVA_HOME: tomcat.javaHome}:{})}});
             terminal.sendText(cmd);
             tomcat.running = true; 
             return;   
@@ -245,7 +244,7 @@ export class ExtensionUtil {
 
         for(let instance of this.tomcatInstances) {
             if(instance.running) {
-                spawn(this.catalinaScript, ['stop'], {shell: true, cwd: path.resolve(instance.catalinaHome, 'bin')});
+                spawn(this.catalinaScript, ['stop'], {shell: true, cwd: path.resolve(instance.catalinaHome, 'bin'), env: {...process.env,  ...(instance.javaHome?{JAVA_HOME: instance.javaHome}:{})}});
             }
         }
 	};
